@@ -249,7 +249,7 @@
     {{- if exists $override }}
     include {{ $override }};
     {{- else }}
-        {{- $keepalive := first (keys (groupByLabel .Containers "com.github.nginx-proxy.nginx-proxy.keepalive")) }}
+        {{- $keepalive := coalesce (first (keys (groupByLabel .Containers "com.github.nginx-proxy.nginx-proxy.keepalive"))) "disabled" }}
     location {{ .Path }} {
         {{- if eq .NetworkTag "internal" }}
         # Only allow traffic from internal clients
@@ -263,17 +263,22 @@
         root {{ trim .VhostRoot }};
         include fastcgi_params;
         fastcgi_pass {{ trim .Upstream }};
-            {{- if $keepalive }}
+            {{- if ne $keepalive "disabled" }}
         fastcgi_keep_conn on;
             {{- end }}
         {{- else if eq .Proto "grpc" }}
         grpc_pass {{ trim .Proto }}://{{ trim .Upstream }};
+        {{- else if eq .Proto "grpcs" }}
+        grpc_pass {{ trim .Proto }}://{{ trim .Upstream }};
         {{- else }}
         proxy_pass {{ trim .Proto }}://{{ trim .Upstream }}{{ trim .Dest }};
-        set $upstream_keepalive {{ if $keepalive }}true{{ else }}false{{ end }};
+        set $upstream_keepalive {{ if ne $keepalive "disabled" }}true{{ else }}false{{ end }};
         {{- end }}
 
-        {{- if (exists (printf "/etc/nginx/htpasswd/%s" .Host)) }}
+        {{- if (exists (printf "/etc/nginx/htpasswd/%s_%s" .Host (sha1 .Path) )) }}
+        auth_basic "Restricted {{ .Host }}/{{ .Path }}";
+        auth_basic_user_file {{ (printf "/etc/nginx/htpasswd/%s_%s" .Host (sha1 .Path)) }};
+        {{- else if (exists (printf "/etc/nginx/htpasswd/%s" .Host)) }}
         auth_basic "Restricted {{ .Host }}";
         auth_basic_user_file {{ (printf "/etc/nginx/htpasswd/%s" .Host) }};
         {{- end }}
@@ -291,7 +296,7 @@
 
 {{- define "upstream" }}
 upstream {{ .Upstream }} {
-    {{- $server_found := false }}
+    {{- $servers := 0 }}
     {{- $loadbalance := first (keys (groupByLabel .Containers "com.github.nginx-proxy.nginx-proxy.loadbalance")) }}
     {{- if $loadbalance }}
     # From the container's loadbalance label:
@@ -306,18 +311,22 @@ upstream {{ .Upstream }} {
         {{- template "container_port" $args }}
         {{- $port := $args.port }}
         {{- if $ip }}
-            {{- $server_found = true }}
+            {{- $servers = add1 $servers }}
     server {{ $ip }}:{{ $port }};
         {{- end }}
     {{- end }}
     {{- /* nginx-proxy/nginx-proxy#1105 */}}
-    {{- if not $server_found }}
+    {{- if lt $servers 1 }}
     # Fallback entry
     server 127.0.0.1 down;
     {{- end }}
-    {{- $keepalive := first (keys (groupByLabel .Containers "com.github.nginx-proxy.nginx-proxy.keepalive")) }}
-    {{- if $keepalive }}
+    {{- $keepalive := coalesce (first (keys (groupByLabel .Containers "com.github.nginx-proxy.nginx-proxy.keepalive"))) "disabled" }}
+    {{- if and (ne $keepalive "disabled") (gt $servers 0) }}
+        {{- if eq $keepalive "auto" }}
+    keepalive {{ mul $servers 2 }};
+        {{- else }}
     keepalive {{ $keepalive }};
+        {{- end }}
     {{- end }}
 }
 {{- end }}
@@ -339,6 +348,13 @@ map $http_x_forwarded_host $proxy_x_forwarded_host {
 map $http_x_forwarded_port $proxy_x_forwarded_port {
     default {{ if $globals.trust_downstream_proxy }}$http_x_forwarded_port{{ else }}$server_port{{ end }};
     '' $server_port;
+}
+
+# Include the port in the Host header sent to the container if it is non-standard
+map $server_port $host_port {
+    default :$server_port;
+    80 '';
+    443 '';
 }
 
 # If the request from the downstream client has an "Upgrade:" header (set to any
@@ -386,7 +402,24 @@ map $proxy_x_forwarded_proto $proxy_x_forwarded_ssl {
 
 gzip_types text/plain text/css application/javascript application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
 
-log_format vhost '{{ or $globals.Env.LOG_FORMAT "$host $remote_addr - $remote_user [$time_local] \"$request\" $status $body_bytes_sent \"$http_referer\" \"$http_user_agent\" \"$upstream_addr\"" }}';
+
+{{- /* See https://nginx.org/en/docs/http/ngx_http_log_module.html#log_format for details and variables
+     * LOG_FORMAT_ESCAPE sets the escape part of the log format
+     * LOG_FORMAT        sets the log format
+     */}}
+{{- $logEscape := printf "escape=%s" (or $globals.Env.LOG_FORMAT_ESCAPE "default") }}
+{{- $logFormat := or $globals.Env.LOG_FORMAT `$host $remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" "$upstream_addr"` }}
+
+{{- if parseBool (or $globals.Env.LOG_JSON "false") }}
+    {{- /* LOG_JSON is a shorthand
+        * that sets logging defaults to JSON format
+        */}}
+# JSON Logging enabled (via LOG_JSON env variable)
+    {{- $logEscape = printf "escape=%s" (or $globals.Env.LOG_FORMAT_ESCAPE "json") }}
+    {{- $logFormat = or $globals.Env.LOG_FORMAT `{"time_local":"$time_iso8601","client_ip":"$http_x_forwarded_for","remote_addr":"$remote_addr","request":"$request","status":"$status","body_bytes_sent":"$body_bytes_sent","request_time":"$request_time","upstream_response_time":"$upstream_response_time","upstream_addr":"$upstream_addr","http_referrer":"$http_referer","http_user_agent":"$http_user_agent","request_id":"$request_id"}` }}
+{{- end }}
+
+log_format vhost {{ $logEscape }} '{{ or $globals.Env.LOG_FORMAT $logFormat }}';
 
 access_log off;
 
@@ -402,7 +435,7 @@ include /etc/nginx/proxy.conf;
 {{- else }}
 # HTTP 1.1 support
 proxy_http_version 1.1;
-proxy_set_header Host $host;
+proxy_set_header Host $host$host_port;
 proxy_set_header Upgrade $http_upgrade;
 proxy_set_header Connection $proxy_connection;
 proxy_set_header X-Real-IP $remote_addr;

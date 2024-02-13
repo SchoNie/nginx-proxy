@@ -181,11 +181,60 @@ If you would like to connect to FastCGI backend, set `VIRTUAL_PROTO=fastcgi` on 
 
 If you use fastcgi,you can set `VIRTUAL_ROOT=xxx`  for your root directory
 
-### Custom log format
+### Logging
 
-If you want to use a custom log format, you can set `LOG_FORMAT=xxx` on the proxy container. 
+The default nginx access log format is
+
+```
+$host $remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" "$upstream_addr"
+```
+
+#### Custom log format
+
+If you want to use a custom access log format, you can set `LOG_FORMAT=xxx` on the proxy container.
 
 With docker compose take care to escape the `$` character with `$$` to avoid variable interpolation. Example: `$remote_addr` becomes `$$remote_addr`.
+
+#### JSON log format
+
+If you want access logs in JSON format, you can set `LOG_JSON=true`. This will correctly set the escape character to `json` and the log format to :
+
+```json
+{
+  "time_local": "$time_iso8601",
+  "client_ip": "$http_x_forwarded_for",
+  "remote_addr": "$remote_addr",
+  "request": "$request",
+  "status": "$status",
+  "body_bytes_sent": "$body_bytes_sent",
+  "request_time": "$request_time",
+  "upstream_response_time": "$upstream_response_time",
+  "upstream_addr": "$upstream_addr",
+  "http_referrer": "$http_referer",
+  "http_user_agent": "$http_user_agent",
+  "request_id": "$request_id"
+}
+```
+
+#### Log format escaping
+
+If you want to manually set nginx `log_format`'s `escape`, set the `LOG_FORMAT_ESCAPE` variable to [a value supported by nginx](https://nginx.org/en/docs/http/ngx_http_log_module.html#log_format).
+
+#### Disable access logs
+
+To disable nginx access logs entirely, set the `DISABLE_ACCESS_LOGS` environment variable to any value.
+
+#### Disabling colors in the container log output
+
+To remove colors from the container log output, set the [`NO_COLOR` environment variable to any value other than an empty string](https://no-color.org/) on the nginx-proxy container.
+
+```console
+docker run --detach \
+  --publish 80:80 \
+  --env NO_COLOR=1 \
+  --volume /var/run/docker.sock:/tmp/docker.sock:ro \
+  nginxproxy/nginx-proxy
+```
 
 ### Default Host
 
@@ -479,6 +528,9 @@ docker run -d -p 80:80 -p 443:443 \
 
 You'll need apache2-utils on the machine where you plan to create the htpasswd file. Follow these [instructions](http://httpd.apache.org/docs/2.2/programs/htpasswd.html)
 
+If you want to define basic authentication for a `VIRTUAL_PATH`, you have to create a file named as /etc/ngingx/htpasswd/${VIRTUAL_HOST}_${VIRTUAL_PATH_SHA1}
+(where $VIRTUAL_PATH_SHA1 is the SHA1 hash for the virtual path, you can use any SHA1 online generator to calculate it).
+
 ### Upstream (Backend) Server HTTP Load Balancing Support
 
 > **Warning**
@@ -520,7 +572,9 @@ services:
 > **Warning**
 > This feature is experimental.  The behavior may change (or the feature may be removed entirely) without warning in a future release, even if the release is not a new major version.  If you use this feature, or if you would like to use this feature but you require changes to it first, please [provide feedback in #2194](https://github.com/nginx-proxy/nginx-proxy/discussions/2194).  Once we have collected enough feedback we will promote this feature to officially supported.
 
-To enable HTTP keep-alive between `nginx-proxy` and a backend server, set the `com.github.nginx-proxy.nginx-proxy.keepalive` label on the server's container to the desired maximum number of idle connections. See the [nginx keepalive documentation](https://nginx.org/en/docs/http/ngx_http_upstream_module.html#keepalive) and the [Docker label documentation](https://docs.docker.com/config/labels-custom-metadata/) for details.
+To enable HTTP keep-alive between `nginx-proxy` and backend server(s), set the `com.github.nginx-proxy.nginx-proxy.keepalive` label on the server's container either to `auto` or to the desired maximum number of idle connections. The `auto` setting will dynamically set the maximum number of idle connections to twice the number of servers listed in the corresponding `upstream{}` block, [per nginx recommendation](https://www.nginx.com/blog/avoiding-top-10-nginx-configuration-mistakes/#no-keepalives).
+
+See the [nginx keepalive documentation](https://nginx.org/en/docs/http/ngx_http_upstream_module.html#keepalive) and the [Docker label documentation](https://docs.docker.com/config/labels-custom-metadata/) for details.
 
 ### Headers
 
@@ -673,18 +727,6 @@ Per virtual-host `servers_tokens` directive can be configured by passing appropr
 By default the nginx configuration `upstream` blocks will use this block's corresponding hostname as a predictable name. However, this can cause issues in some setups (see [this issue](https://github.com/nginx-proxy/nginx-proxy/issues/1162)). In those cases you might want to switch to SHA1 names for the `upstream` blocks by setting the `SHA1_UPSTREAM_NAME` environment variable to `true` on the nginx-proxy container.
 
 Please note that using regular expressions in `VIRTUAL_HOST` will always result in a corresponding `upstream` block with an SHA1 name.
-
-### Disabling colors in the log output
-
-To remove colors from the log output, set the [`NO_COLOR` environment variable to any value other than an empty string](https://no-color.org/) on the nginx-proxy container.
-
-```console
-docker run --detach \
-  --publish 80:80 \
-  --env NO_COLOR=1 \
-  --volume /var/run/docker.sock:/tmp/docker.sock:ro \
-  nginxproxy/nginx-proxy
-```
 
 ### Troubleshooting
 
