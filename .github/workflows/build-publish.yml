@@ -71,24 +71,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push the image
-        id: docker_build
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: Dockerfile.${{ matrix.base }}
-          build-args: |
-            NGINX_PROXY_VERSION=${{ steps.nginx-proxy_version.outputs.VERSION }}
-            DOCKER_GEN_VERSION=${{ steps.docker-gen_version.outputs.VERSION }}
-          platforms: linux/amd64,linux/arm64,linux/s390x,linux/arm/v7
-          sbom: true
-          push: true
-          provenance: mode=max
-          tags: ${{ steps.docker_meta.outputs.tags }}
-          labels: ${{ steps.docker_meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
       - name: Images digests
         run: |
           {
