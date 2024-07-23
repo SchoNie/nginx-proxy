@@ -100,9 +100,8 @@ jobs:
       - name: Images digests
           run: |
               echo "### :rocket: Workflow inputs"
-              echo "| Arg                 | Value |"
-              echo "| ------------------- | ----- |"
-              echo "| NGINX_PROXY_VERSION | ${{ steps.nginx-proxy_version.outputs.VERSION }} |"
-              echo "| DOCKER_GEN_VERSION  | ${{ steps.docker-gen_version.outputs.VERSION }} |"
-              echo "| DIGEST              | ${{ steps.docker_build.outputs.digest }} |"
-              >> $GITHUB_STEP_SUMMARY
+              echo "| Arg                 | Value |" >> $GITHUB_STEP_SUMMARY
+              echo "| ------------------- | ----- |" >> $GITHUB_STEP_SUMMARY
+              echo "| NGINX_PROXY_VERSION | ${{ steps.nginx-proxy_version.outputs.VERSION }} |" >> $GITHUB_STEP_SUMMARY
+              echo "| DOCKER_GEN_VERSION  | ${{ steps.docker-gen_version.outputs.VERSION }} |" >> $GITHUB_STEP_SUMMARY
+              echo "| DIGEST              | ${{ steps.docker_build.outputs.digest }} |" >> $GITHUB_STEP_SUMMARY
