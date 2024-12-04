@@ -38,7 +38,7 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           images: |
-            nginxproxy/nginx-proxy
+            ghcr.io/SchoNie/nginx-proxy
           tags: |
             type=raw,value=${{ inputs.image_tag }},enable=${{ matrix.flavor == 'debian' }}
             type=raw,value=${{ inputs.image_tag }},suffix=-alpine,enable=${{ matrix.flavor == 'alpine' }}
@@ -54,13 +54,7 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v4
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
+        
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v4
         with:
