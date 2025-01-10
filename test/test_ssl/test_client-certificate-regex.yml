@@ -1,5 +1,5 @@
 services:
-  mtls-enabled:
+  mtls-regex-enabled:
     image: web
     expose:
       - "84"
@@ -7,10 +7,3 @@ services:
       WEB_PORTS: "84"
       VIRTUAL_HOST: ~^regex.*\.nginx-proxy\.tld$
       CERT_NAME: nginx-proxy.tld
-
-  sut:
-    image: nginxproxy/nginx-proxy:test
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-      - ./certs:/etc/nginx/certs:ro
-      - ./vhost.d:/etc/nginx/vhost.d:ro

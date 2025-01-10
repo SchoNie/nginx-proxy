@@ -1,5 +1,5 @@
 services:
-  mtls-enabled:
+  mtls-vhost-enabled:
     image: web
     expose:
       - "84"
@@ -7,7 +7,7 @@ services:
       WEB_PORTS: "84"
       VIRTUAL_HOST: "mtls-enabled.nginx-proxy.tld"
 
-  mtls-optional:
+  mtls-vhost-optional:
     image: web
     expose:
       - "85"
@@ -22,9 +22,6 @@ services:
     labels:
       com.github.nginx-proxy.nginx-proxy.ssl_verify_client: "optional"
 
-  sut:
-    image: nginxproxy/nginx-proxy:test
+  nginx-proxy:
     volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-      - ./certs:/etc/nginx/certs:ro
-      - ./vhost.d:/etc/nginx/vhost.d:ro
+      - ${PYTEST_MODULE_PATH}/certs/mtls-optional.nginx-proxy.tld_6dbd548cc03e44b8b44b6e68e56255ce4273ae49_location:/etc/nginx/vhost.d/mtls-optional.nginx-proxy.tld_6dbd548cc03e44b8b44b6e68e56255ce4273ae49_location:ro
