@@ -15,6 +15,9 @@ jobs:
       matrix:
         base: [alpine, debian]
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      attestations: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
