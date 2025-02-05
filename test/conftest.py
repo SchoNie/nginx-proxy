@@ -509,7 +509,7 @@ class DockerComposer(contextlib.AbstractContextManager):
             docker_compose_up(docker_compose_files, project_name)
             self._networks = connect_to_all_networks()
             wait_for_nginxproxy_to_be_ready()
-            time.sleep(1)  # give time to containers to be ready
+            time.sleep(2)  # give time to containers to be ready
 
         except KeyboardInterrupt:
             logging.warning("KeyboardInterrupt detected! Force cleanup...")
