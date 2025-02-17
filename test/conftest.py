@@ -501,6 +501,7 @@ class DockerComposer(contextlib.AbstractContextManager):
         if docker_compose_files is None or project_name is None:
             logging.info(f"Skipping compose: no compose file specified")
             return
+        self._down()
         self._docker_compose_files = docker_compose_files
         self._project_name = project_name
         logging.debug(f"DockerComposer compose {self._docker_compose_files} {self._project_name} {self._networks}")
