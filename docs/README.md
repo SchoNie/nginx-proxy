@@ -378,7 +378,7 @@ You'll need apache2-utils on the machine where you plan to create the htpasswd f
 ## mTLS client side certificate authentication
 In mTLS, both the client and server have a certificate, and both sides authenticate using their public/private key pair.
 A "root" TLS certificate is necessary for mTLS; this enables an organization to be their own certificate authority. The certificates used by authorized clients and servers have to correspond to this root certificate. The root certificate is self-signed, meaning that the organization creates it themselves.
-Make sure you have a root certificate (CA) and client public/private key pair according to:
+Make sure you have a root certificate (CA) and client public/private key pair. There is a [howto in the wiki](https://github.com/nginx-proxy/nginx-proxy/wiki/).
 
 ### Certificate Authority (CA)
 #### Per-VIRTUAL_HOST CA
@@ -1358,6 +1358,7 @@ Configuration available on each proxied container, either by environment variabl
 | n/a | [`com.github.nginx-proxy.nginx-proxy.non-get-redirect`](#how-ssl-support-works) | global (proxy) value |
 | [`SERVER_TOKENS`](#per-virtual_host-server_tokens-configuration) | n/a | no default value |
 | [`SSL_POLICY`](#how-ssl-support-works) | n/a | global (proxy) value |
+| n/a | [`com.github.nginx-proxy.nginx-proxy.ssl_verify_client`](#optional-ssl_verify_client) | `on` |
 | n/a | [`com.github.nginx-proxy.nginx-proxy.trust-default-cert`](#default-and-missing-certificate) | global (proxy) value |
 | [`VIRTUAL_DEST`](#virtual_dest) | n/a | `empty string` |
 | [`VIRTUAL_HOST`](#virtual-hosts-and-ports) | n/a | no default value |
