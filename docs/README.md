@@ -5,7 +5,7 @@
 - [Docker Networking](#docker-networking)
 - [Upstream (Backend) features](#upstream-backend-features)
 - [Basic Authentication Support](#basic-authentication-support)
-- [mTLS client side certificate authentication] (#mtls-client-side-certificate-authentication)
+- [mTLS client side certificate authentication](#mtls-client-side-certificate-authentication)
 - [Logging](#logging)
 - [SSL Support](#ssl-support)
 - [IPv6 Support](#ipv6-nat)
