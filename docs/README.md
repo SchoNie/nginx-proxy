@@ -1509,22 +1509,22 @@ A "root" TLS certificate is necessary for mTLS; this enables an organization to 
 Make sure you have a root certificate (CA) and client public/private key pair according to:
 
 ### Certificate Authority (CA)
-#### Per-VIRTUAL_HOST
+#### Per-VIRTUAL_HOST CA
 In order to secure a virtual host, you have to copy your CA certificate file (ca.crt) named as its equivalent `VIRTUAL_HOST` variable or if `VIRTUAL_HOST` is a regex, after the sha1 hash of the regex with the suffix `.ca.crt` in directory
 `/etc/nginx/certs/`. Example: `/etc/nginx/certs/app.example.com.ca.crt`.
 Or if your `VIRTUAL_HOST` is a regex: `/etc/nginx/certs/9ae5d1b655182b052fed458ec701f9ae1524e1c2.ca.crt`.
 
-#### Global
+#### Global CA
 If you want to secure everything globally you can copy your CA certificate file (ca.crt) named as `ca.crt` in directory
 `/etc/nginx/certs/`. Example: `/etc/nginx/certs/ca.crt`.
 
 ### Certificate Revocation List (CRL)
-#### Per-VIRTUAL_HOST
+#### Per-VIRTUAL_HOST CRL
 In order to use a certificate revocation list, you have to copy your CRL file named as its equivalent `VIRTUAL_HOST` variable or if `VIRTUAL_HOST` is a regex, after the sha1 hash of the regex with the suffix `.crl.pem` in directory
 `/etc/nginx/certs/`. Example: `/etc/nginx/certs/app.example.com.crl.pem`.
 Or if your `VIRTUAL_HOST` is a regex: `/etc/nginx/certs/9ae5d1b655182b052fed458ec701f9ae1524e1c2.crl.pem`.
 
-#### Global
+#### Global CRL
 If you want to use a global CRL file you have to copy your CRL file named as `ca.crl.pem` in directory
 `/etc/nginx/certs/`. Example: `/etc/nginx/certs/ca.crl.pem`.
 
