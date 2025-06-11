@@ -1,9 +1,9 @@
+[![GitHub Repo stars](https://img.shields.io/github/stars/nginx-proxy/nginx-proxy?style=flat&logo=github)](https://github.com/nginx-proxy/nginx-proxy)
 [![Test](https://img.shields.io/github/actions/workflow/status/nginx-proxy/nginx-proxy/test.yml?logo=pytest&label=Tests)](https://github.com/nginx-proxy/nginx-proxy/actions/workflows/test.yml)
 [![GitHub release](https://img.shields.io/github/v/release/nginx-proxy/nginx-proxy?logo=github)](https://github.com/nginx-proxy/nginx-proxy/releases)
 [![nginx 1.27.5](https://img.shields.io/badge/nginx-1.27.5-brightgreen.svg?logo=nginx)](https://nginx.org)
 [![Docker Debian Image Size](https://img.shields.io/docker/image-size/nginxproxy/nginx-proxy?sort=semver&logo=docker&label=Debian%20image%20size)](https://hub.docker.com/r/nginxproxy/nginx-proxy/tags "Click to view the image on Docker Hub")
 [![Docker Alpine Image Size](https://img.shields.io/docker/image-size/nginxproxy/nginx-proxy/alpine?sort=semver&logo=docker&label=Alpine%20image%20size)](https://hub.docker.com/r/nginxproxy/nginx-proxy/tags?name=alpine "Click to view the image on Docker Hub")
-[![Docker stars](https://img.shields.io/docker/stars/nginxproxy/nginx-proxy?logo=docker)](https://hub.docker.com/r/nginxproxy/nginx-proxy "DockerHub")
 [![Docker pulls](https://img.shields.io/docker/pulls/nginxproxy/nginx-proxy?logo=docker)](https://hub.docker.com/r/nginxproxy/nginx-proxy "DockerHub")
 
 nginx-proxy sets up a container running nginx and [docker-gen](https://github.com/nginx-proxy/docker-gen). docker-gen generates reverse proxy configs for nginx and reloads nginx when containers are started and stopped.
