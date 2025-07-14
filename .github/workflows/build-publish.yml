@@ -27,6 +27,10 @@ jobs:
     runs-on: ubuntu-latest
     if: (github.event_name == 'schedule' && github.repository == 'nginx-proxy/nginx-proxy') || (github.event_name != 'schedule')
     steps:
+      - uses: GitHubSecurityLab/actions-permissions/monitor@v1
+        with:
+          config: ${{ vars.PERMISSIONS_CONFIG }}
+          
       - name: Checkout
         uses: actions/checkout@v4
         with:
