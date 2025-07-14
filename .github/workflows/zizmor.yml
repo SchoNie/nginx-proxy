@@ -7,7 +7,8 @@ on:
   pull_request:
     branches: ["**"]
 
-permissions: {}
+permissions:
+  workflows:write
 
 jobs:
   zizmor:
