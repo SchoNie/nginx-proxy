@@ -31,3 +31,4 @@ jobs:
           # since it contains integration tests.
           inputs: ./.github/
           advanced-security: false
+          persona: auditor
