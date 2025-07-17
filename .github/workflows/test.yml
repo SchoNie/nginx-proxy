@@ -13,6 +13,8 @@ on:
       - "LICENSE"
       - "**.md"
 
+permissions: {}
+
 jobs:
   unit:
     name: Unit Tests

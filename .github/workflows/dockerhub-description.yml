@@ -8,6 +8,8 @@ on:
       - README.md
       - .github/workflows/dockerhub-description.yml
 
+permissions: {}
+
 jobs:
   dockerHubDescription:
     name: Update Docker Hub Description

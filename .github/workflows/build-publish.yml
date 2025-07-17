@@ -18,6 +18,8 @@ on:
       - "Makefile"
       - "*.md"
 
+permissions: {}
+
 jobs:
   multiarch-build:
     name: Build and publish image
