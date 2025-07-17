@@ -25,7 +25,11 @@ jobs:
       matrix:
         base: [alpine, debian]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     if: (github.event_name == 'schedule' && github.repository == 'nginx-proxy/nginx-proxy') || (github.event_name != 'schedule')
+
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
