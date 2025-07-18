@@ -3,7 +3,7 @@ name: Security Analysis with zizmor
 on:
   workflow_dispatch:
   push:
-#    branches: ["main"]
+    branches: ["main"]
   pull_request:
     branches: ["**"]
 
