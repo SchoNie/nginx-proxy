@@ -31,3 +31,10 @@ jobs:
           if [[ ! $title =~ ^.*:\ .*$ ]]; then
             echo "Bad issue title"
           fi
+
+      - name: Check title2
+        run: |
+          title="${{ github.event.issue.title }}"
+          if [[ ! $title =~ ^.*:\ .*$ ]]; then
+            echo "Bad issue title"
+          fi
