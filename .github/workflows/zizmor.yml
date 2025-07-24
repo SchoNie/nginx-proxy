@@ -24,3 +24,11 @@ jobs:
 
       - name: Run zizmor 🌈
         uses: zizmorcore/zizmor-action@f52a838cfabf134edcbaa7c8b3677dde20045018 # v0.1.1
+
+      - name: Check title
+        run: |
+          title="${{ github.event.issue.title }}"
+          if [[ ! $title =~ ^.*:\ .*$ ]]; then
+            echo "Bad issue title"
+            exit 1
+          fi
