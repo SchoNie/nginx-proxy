@@ -33,7 +33,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-#          python -m pip install --upgrade pip
           uv pip install -r python-requirements.txt
         working-directory: test/requirements
 
