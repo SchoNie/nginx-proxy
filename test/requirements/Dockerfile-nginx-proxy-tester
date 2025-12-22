@@ -15,14 +15,13 @@ RUN apt update \
   && chmod a+r /etc/apt/keyrings/docker.asc
 
 # Add the Docker repository to Apt sources
-RUN tee \
-  /etc/apt/sources.list.d/docker.sources <<EOF \
-    Types: deb \
-    URIs: https://download.docker.com/linux/debian \
-    Suites: $(. /etc/os-release && echo "$VERSION_CODENAME") \
-    Components: stable \
-    Signed-By: /etc/apt/keyrings/docker.asc \
-  EOF
+RUN echo \
+  "Types: deb\n \
+  URIs: https://download.docker.com/linux/ubuntu\n \
+  Suites: $(. /etc/os-release && echo \"$VERSION_CODENAME\")\n \
+  Components: stable\n \
+  Signed-By: /etc/apt/keyrings/docker.asc" \
+  > /etc/apt/sources.list.d/docker.sources
 
 # Install docker-ce-cli and docker-compose-plugin requirements for Pytest docker_compose fixture
 RUN apt update \
